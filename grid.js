@@ -8,8 +8,9 @@
 class Grid {
 
   /* コンストラクタ */
-  constructor(svgId, xMin, xMax, yMin, yMax, 
-    margin={top: 30, right: 30, bottom: 50, left: 30}) {
+  constructor(svgId, data, 
+    margin={top: 30, right: 30, bottom: 50, left: 30,
+      xPercentage: 10, yPercentage: 10}) {
 
     // マージンの値をチェック & セットする
     Grid.checkMargin(margin);
@@ -22,8 +23,34 @@ class Grid {
     this.height = parseInt(
       this.svg.style("height").replace("px", ""));
 
+    // x、y 値の最小値、最大値を取得する
+    let xs = data.map(record => this.getX(record));
+    let xMin = d3.min(xs);
+    let xMax = d3.max(xs);
+    let ys = data.map(record => this.getY(record));
+    let yMin = d3.min(ys);
+    let yMax = d3.max(ys);
+
     // x 方向の入力値が日付オブジェクトかどうか
     this.xIsDate = xMin instanceof Date;
+
+    if (this.xIsDate) {
+
+      // x 値の最小値、最大値を調整する ( 日付オブジェクトの場合 )
+      [xMin, xMax] = this.adjustMinMaxDate(xMin, xMax, 
+        margin["xPercentage"]);
+
+    } else {
+
+      // x 値の最小値、最大値を調整する ( 余裕を持たせる )
+      [xMin, xMax] = this.adjustMinMax(xMin, xMax,
+        margin["xPercentage"]);
+      
+    }
+
+    // y 値の最小値、最大値を調整する ( 余裕を持たせる )
+    [yMin, yMax] = this.adjustMinMax(yMin, yMax,
+        margin["yPercentage"]);
 
     // x 方向のスケールを作成する
     this.x = this.createXScale(xMin, xMax);
@@ -47,7 +74,8 @@ class Grid {
   /* マージンの値をチェックする */
   static checkMargin(margin) {    
 
-    let validNames = ["top", "right", "bottom", "left"];
+    let validNames = ["top", "right", "bottom", "left",
+      "xPercentage", "yPercentage"];
     Object.entries(margin).forEach((kv) => {
       let [attr, val] = kv;
 
@@ -65,6 +93,34 @@ class Grid {
 
     });
 
+  }
+
+  /* 最小値、最大値に幅を持たせて調整する ( 日付オブジェクトの場合 ) */
+  adjustMinMaxDate(min, max, percentage) {
+    console.log(min);
+    let milliSecondsSpan = max - min;
+    let delta = milliSecondsSpan * percentage / 100;
+    let newMin = new Date(min.getTime() - delta);
+    let newMax = new Date(max.getTime() + delta);
+    return [newMin, newMax];
+  }
+
+  /* 最小値に幅を持たせて調整する */
+  adjustMinMax(min, max, percentage) {
+    let r = percentage / 100;
+    let span = max - min;
+    let delta = span * r;
+    return [min - delta, max + delta];
+  }
+
+  /* x 方向に相当する値を取り出す ( データへのアクセサ ) */
+  getX(record) {
+    return record[0];
+  }
+
+  /* y 方向に相当する値を取り出す ( データへのアクセサ ) */
+  getY(record) {
+    return record[1];
   }
 
   /* x 方向のスケールを作成する */
@@ -191,17 +247,3 @@ class Grid {
   }
 
 }
-
-
-/* テスト */
-// let svgId = "graphArea";
-// let xMin = new Date("2018-07-17 00:00:00");
-// let xMax = new Date("2018-07-19 12:00:00");
-// let xMin = 2000;
-// let xMax = 10000;
-// let yMin = 10;
-// let yMax = 110;
-// let g = new Grid(svgId, xMin, xMax, yMin, yMax);
-// console.dir(g);
-// console.log(g.x(new Date("2018-07-18 00:00:00")));
-// console.log(g.y(50));
