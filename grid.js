@@ -23,46 +23,8 @@ class Grid {
     this.height = parseInt(
       this.svg.style("height").replace("px", ""));
 
-    // x、y 値の最小値、最大値を取得する
-    let xs = data.map(record => this.getX(record));
-    let xMin = d3.min(xs);
-    let xMax = d3.max(xs);
-    let ys = data.map(record => this.getY(record));
-    let yMin = d3.min(ys);
-    let yMax = d3.max(ys);
-
-    // x 方向の入力値が日付オブジェクトかどうか
-    this.xIsDate = xMin instanceof Date;
-
-    if (this.xIsDate) {
-
-      // x 値の最小値、最大値を調整する ( 日付オブジェクトの場合 )
-      [xMin, xMax] = this.adjustMinMaxDate(xMin, xMax, 
-        margin["xPercentage"]);
-
-    } else {
-
-      // x 値の最小値、最大値を調整する ( 余裕を持たせる )
-      [xMin, xMax] = this.adjustMinMax(xMin, xMax,
-        margin["xPercentage"]);
-      
-    }
-
-    // y 値の最小値、最大値を調整する ( 余裕を持たせる )
-    [yMin, yMax] = this.adjustMinMax(yMin, yMax,
-        margin["yPercentage"]);
-
-    // x 方向のスケールを作成する
-    this.x = this.createXScale(xMin, xMax);
-
-    // y 方向のスケールを作成する
-    this.y = this.createYScale(yMin, yMax);
-
-    // x 軸と目盛りを作成する
-    this.xAxis = this.setXAxis();
-
-    // y 軸と目盛りを作成する
-    this.yAxis = this.setYAxis();
+    // x、y 方向のスケールと軸を設定する
+    this.setupScalesAndAxes(data);
 
   }
 
@@ -71,7 +33,7 @@ class Grid {
     return !isNaN(parseFloat(n)) && isFinite(n);
   };
 
-  /* マージンの値をチェックする */
+  /* マージンの値をチェックする ( ※気休め程度でしかないが.. )*/
   static checkMargin(margin) {    
 
     let validNames = ["top", "right", "bottom", "left",
@@ -95,9 +57,24 @@ class Grid {
 
   }
 
+  /* x、y 方向の最小値、最大値を取得する */
+  getMinMax(data) {
+
+    // x 方向の最小値、最大値
+    let xs = data.map(record => this.getX(record));
+    let xMin = d3.min(xs);
+    let xMax = d3.max(xs);
+
+    // y 方向の最小値、最大値
+    let ys = data.map(record => this.getY(record));
+    let yMin = d3.min(ys);
+    let yMax = d3.max(ys);
+
+    return [xMin, xMax, yMin, yMax];
+  }
+
   /* 最小値、最大値に幅を持たせて調整する ( 日付オブジェクトの場合 ) */
   adjustMinMaxDate(min, max, percentage) {
-    console.log(min);
     let milliSecondsSpan = max - min;
     let delta = milliSecondsSpan * percentage / 100;
     let newMin = new Date(min.getTime() - delta);
@@ -244,6 +221,47 @@ class Grid {
       .style("stroke-width", "1px");
 
     return yAxis;
+  }
+
+  /* x、y 方向のスケールと軸を設定する */
+  setupScalesAndAxes(data) {
+
+    // x、y 値の最小値、最大値を取得する
+    let [xMin, xMax, yMin, yMax] = this.getMinMax(data);
+
+    // x 方向の入力値が日付オブジェクトかどうか
+    this.xIsDate = xMin instanceof Date;
+
+    if (this.xIsDate) {
+
+      // x 値の最小値、最大値を調整する ( 日付オブジェクトの場合 )
+      [xMin, xMax] = this.adjustMinMaxDate(xMin, xMax, 
+        this.margin["xPercentage"]);
+
+    } else {
+
+      // x 値の最小値、最大値を調整する ( 余裕を持たせる )
+      [xMin, xMax] = this.adjustMinMax(xMin, xMax,
+        this.margin["xPercentage"]);
+      
+    }
+
+    // y 値の最小値、最大値を調整する ( 余裕を持たせる )
+    [yMin, yMax] = this.adjustMinMax(yMin, yMax,
+        this.margin["yPercentage"]);
+
+    // x 方向のスケールを作成する
+    this.x = this.createXScale(xMin, xMax);
+
+    // y 方向のスケールを作成する
+    this.y = this.createYScale(yMin, yMax);
+
+    // x 軸と目盛りを作成する
+    this.xAxis = this.setXAxis();
+
+    // y 軸と目盛りを作成する
+    this.yAxis = this.setYAxis();
+
   }
 
 }
