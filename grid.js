@@ -149,9 +149,16 @@ class Grid {
     return d;
   }
 
+  /* 縦方向の罫線のスタイルを設定する */
+  setGridColorV(d, i) {
+    if (d === 0) return "darkgray";
+    else return "lightgray";
+  }
+
   /* x 軸と目盛りを作成する */
   setXAxis() {
 
+    // x 方向の目盛りを描画する
     let xAxis = this.svg.append("g")
       .attr("class", "x-axis")
       .attr(
@@ -171,7 +178,7 @@ class Grid {
 
     // 罫線のスタイルを設定する
     xAxis.selectAll("line")
-      .style("stroke", "lightgray")
+      .style("stroke", this.setGridColorV)
       .style("stroke-opacity", 0.7)
       .style("shape-rendering", "crispEdges");
 
@@ -188,9 +195,16 @@ class Grid {
     return d;
   }
 
+  /* 横方向の罫線の色を設定する */
+  setGridColorH(d, i) {
+    if (d === 0) return "darkgray";
+    else return "lightgray";
+  }
+
   /* y 軸と目盛りを作成する */
   setYAxis() {
 
+    // y 方向の目盛りを描画する
     let yAxis = this.svg.append("g")
       .attr("class", "y-axis")
       .attr(
@@ -211,7 +225,7 @@ class Grid {
 
     // 罫線のスタイルを設定する
     yAxis.selectAll("line")
-      .style("stroke", "lightgray")
+      .style("stroke", this.setGridColorH)
       .style("stroke-opacity", 0.7)
       .style("shape-rendering", "crispEdges");
 
