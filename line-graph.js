@@ -6,10 +6,10 @@
 class LineGraph extends Grid {
 
   /* コンストラクタ */
-  constructor(svgId, data, 
+  constructor(svgId, 
     margin={top: 30, right: 30, bottom: 50, left: 30,
       xPercentage: 10, yPercentage: 10}) {
-    super(svgId, data, margin);
+    super(svgId, margin);
 
     // 折れ線描画用の関数
     this.lineFunc = null;
@@ -34,7 +34,8 @@ class LineGraph extends Grid {
 
   /* x 軸の目盛りの形式を設定する */
   formatTickX(d) {
-    let format = d3.timeFormat("%m/%d %p");
+    // let format = d3.timeFormat("%m/%d %p");
+    let format = d3.timeFormat("%m/%d");
     return format(d);
   }
 

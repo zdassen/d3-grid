@@ -8,7 +8,7 @@
 class Grid {
 
   /* コンストラクタ */
-  constructor(svgId, data, 
+  constructor(svgId, 
     margin={top: 30, right: 30, bottom: 50, left: 30,
       xPercentage: 10, yPercentage: 10}) {
 
@@ -24,8 +24,7 @@ class Grid {
       this.svg.style("height").replace("px", ""));
 
     // x、y 方向のスケールと軸を設定する
-    this.setupScalesAndAxes(data);
-
+    // this.setupScalesAndAxes(data);
   }
 
   /*数値であることの確認を行う */
