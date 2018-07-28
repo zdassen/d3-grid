@@ -64,6 +64,7 @@ class Legend {
       );
 
     // タイトル文字列を描画する
+    let offsetY = 1;    // 微調整する
     let labels = g.selectAll("text")
       .data(this.titles)
       .enter()
@@ -73,7 +74,7 @@ class Legend {
         "transform", (d, i) => {
           return "translate(" + [
             ml + w + baselineAdjustH,
-            mt + (h + mb) * i + baselineAdjustV
+            mt + (h + mb) * i + baselineAdjustV + offsetY
           ].join(",") + ")";
         }
       )
